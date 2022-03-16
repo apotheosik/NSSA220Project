@@ -1,3 +1,4 @@
+#!/bin/bash
 #Chris Sequeira 
 #spawn, network, kill 
 
@@ -11,9 +12,12 @@
 
 #HARD DRIVE UTILIZATION 
 
-#NETWORK STATISTICS 
+#NETWORK rx AND TX of ens INTERFACE 
+ifstat | grep ens | awk '{print $7, $9}'
 
-#KILL PROCESSES FUNCTION 
+#PROCESS STATISTICS 
+
+#KILL PROCESSES FUNCTION -------_ MAY NOT HANDLE CHILDREN
 function cleanup {
 	ps -e | grep APM | sed 's/\|/ /' | awk '{print $1}' > ps.txt
 	File="ps.txt"
@@ -23,4 +27,6 @@ function cleanup {
 		kill $line 
 	done
 }
+	
+#pkill as alternate option; see linuxize cmd 
 	
