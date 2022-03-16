@@ -1,0 +1,26 @@
+#Chris Sequeira 
+#spawn, network, kill 
+
+#spawn 
+./APM1 8.8.8.8
+./APM2 8.8.8.8
+./APM3 8.8.8.8
+./APM4 8.8.8.8
+./APM5 8.8.8.8
+./APM6 8.8.8.8
+
+#HARD DRIVE UTILIZATION 
+
+#NETWORK STATISTICS 
+
+#KILL PROCESSES FUNCTION 
+function cleanup {
+	ps -e | grep APM | sed 's/\|/ /' | awk '{print $1}' > ps.txt
+	File="ps.txt"
+	procList = $(cat ps.txt)
+	For Line in $Lines 
+	do
+		kill $line 
+	done
+}
+	
