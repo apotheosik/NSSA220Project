@@ -16,26 +16,48 @@ function setup () {
 }
 
 #hard drive metrics
-function hard_drive () {
+function disk () {
 	drive="nvme0n1"
 	kbwps=$(iostat | grep "$drive" | awk '{FS="\t"; print $4}')
 	kbw=$(df | grep "\/$" | awk '{print $3 * 0.001024}' | bc)
-	echo $kbwps $kbw
+	echo "${kbwps},${$kbw}"
 }
 
 #network rx and tx of ens interface
 function network () {
-	ifstat | grep ens | awk '{print $7, $9}'
+	ifstat | grep ens | awk '{print $7,$9}'
 }
 
 #process metrics
 function process () {
-	cpu=$(ps -aux | grep APM | head -n -1 | awk '{print $3}')
-	mem=$(ps -aux | grep APM | head -n -1 | awk '{print $4}')
-	echo $cpu $mem
+	cpu=$(ps -aux | grep APM | head -n -1 | awk '{print $3}' | tr '\n' ',')
+	mem=$(ps -aux | grep APM | head -n -1 | awk '{print $4}' | tr '\n' ',')
+	echo "${runtime},${cpu::-1},${mem::-1}" >> process_metrics.csv
 }
 
-#Collect all metrics
+#collect system metrics
+function collect_system () {
+	echo "${runtime},${network},${disk}" >> system_metrics.csv
+}
+
+#main loop
+function main_loop() {
+	runtime=0
+	max_runtime=10
+	while true; do 
+		if [ $runtime -ge $max_runtime ]
+		then
+			break
+		fi
+		if (( $runtime % 5 == 0 ))
+		then
+			collect_system &
+		fi
+		process &
+		runtime=$(( $runtime + 1))
+		sleep 1
+	done	
+}
 
 #kill all APM processes 
 function cleanup {
@@ -45,5 +67,5 @@ function cleanup {
 
 spawn
 setup
-process
+main_loop
 cleanup
