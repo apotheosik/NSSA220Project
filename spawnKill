@@ -29,7 +29,11 @@ function network () {
 }
 
 #process metrics
-function process () {}
+function process () {
+	cpu=$(ps -aux | grep APM | head -n -1 | awk '{print $3}')
+	mem=$(ps -aux | grep APM | head -n -1 | awk '{print $4}')
+	echo $cpu $mem
+}
 
 #Collect all metrics
 
@@ -41,4 +45,5 @@ function cleanup {
 
 spawn
 setup
+process
 cleanup
