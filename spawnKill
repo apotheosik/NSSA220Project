@@ -1,0 +1,35 @@
+#Chris Sequeira 
+#spawn, network, kill 
+
+#spawn APM processes
+function spawn () {
+	for i in APM{1..6};do
+		./executables/${i} 8.8.8.8 &
+		echo "[+] Started ${i}"
+	done
+}
+
+#set up csv for getting stats
+function setup () {
+	echo "time,APM1 CPU,APM2 CPU,APM3 CPU,APM4 CPU,APM4 CPU,APM5 CPU,APM6 CPU,APM1 Memory,APM2 Memory,APM3 Memory,APM4 Memory,APM4 Memory,APM5 Memory,APM6 Memory" > process_metrics.csv
+	echo "time,RX Data Rate,TX Data Rate,Disk Writes,Disk Capacity" > system_metrics.csv
+}
+
+#HARD DRIVE UTILIZATION 
+
+#NETWORK rx AND TX of ens INTERFACE
+function network () {
+	ifstat | grep ens | awk '{print $7, $9}'
+}
+
+#PROCESS STATISTICS
+
+#KILL PROCESSES FUNCTION 
+function cleanup {
+	pkill APM
+	echo "[+] Killed all processes"
+}
+
+spawn
+setup
+cleanup
